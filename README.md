@@ -31,7 +31,7 @@ Aesthetic animations, glitchy effects, and a vibrant neon palette create a stron
 
 ---
 ## Screenshots 
-![ App Screenshot](./Screenshot(747).png)
+![Screenshot](./Screenshot%20(747).png)
 
 ## 🧪 How to Use
 Connect MetaMask
