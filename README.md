@@ -33,6 +33,9 @@ Aesthetic animations, glitchy effects, and a vibrant neon palette create a stron
 ## Screenshots 
 ![Screenshot](./Screenshot%20(747).png)
 
+## Vercel Link
+[ Live Demo on Vercel](https://blockchain-crowdfunding-app-by-tk.vercel.app/)
+
 ## 🧪 How to Use
 Connect MetaMask
 Ensure MetaMask is installed and connected to Sepolia or your testnet of choice.
