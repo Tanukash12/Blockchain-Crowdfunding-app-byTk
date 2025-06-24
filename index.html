@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crowdfunding dApp</title>
+    <link rel="icon" href="https://fav.farm/🧠" />
+    <style>
+      :root {
+        --bg: #0f0f0f;
+        --primary: #00ff9f;
+        --text: #e6e6e6;
+        --accent: #00ffff;
+        --danger: #ff206e;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Courier New', Courier, monospace;
+        background-color: var(--bg);
+        color: var(--text);
+        padding: 2rem;
+        animation: glitchBg 5s infinite;
+      }
+
+      @keyframes glitchBg {
+        0%, 100% {
+          background-color: #0f0f0f;
+        }
+        50% {
+          background-color: #0a0a0a;
+        }
+      }
+
+      h1 {
+        text-align: center;
+        color: var(--primary);
+        text-shadow: 0 0 5px var(--accent);
+        margin-bottom: 2rem;
+        animation: typing 3s steps(20), blink-caret 0.75s step-end infinite;
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 2px solid var(--primary);
+      }
+
+      @keyframes typing {
+        from { width: 0 }
+        to { width: 100% }
+      }
+
+      @keyframes blink-caret {
+        from, to { border-color: transparent }
+        50% { border-color: var(--primary); }
+      }
+
+      .container {
+        max-width: 700px;
+        margin: auto;
+        background-color: #111;
+        padding: 2rem;
+        border: 1px solid var(--accent);
+        border-radius: 10px;
+        box-shadow: 0 0 10px var(--accent);
+      }
+
+      input, textarea, button {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 1rem;
+        background-color: #222;
+        border: 1px solid #555;
+        color: var(--text);
+        border-radius: 5px;
+      }
+
+      button {
+        background-color: var(--primary);
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background-color: var(--accent);
+      }
+
+      .campaign {
+        border: 1px dashed var(--accent);
+        padding: 1rem;
+        margin-top: 1rem;
+        border-radius: 8px;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 3rem;
+        font-size: 0.9rem;
+        color: var(--accent);
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🧠 Crowdfunding Portal</h1>
+
+    <div class="container">
+      <form id="createForm">
+        <input type="text" id="title" placeholder="Campaign Title" required />
+        <textarea id="description" placeholder="Description" required></textarea>
+        <input type="number" id="target" placeholder="Target (ETH)" step="0.01" min="0.01" required />
+        <input type="date" id="deadline" placeholder="Deadline (timestamp)" required />
+        <input type="text" id="image" placeholder="Image URL" required />
+        <button type="submit">🚀 Launch Campaign</button>
+      </form>
+
+      <button onclick="loadCampaigns()">🔄 View Campaigns</button>
+
+      <div id="campaignList"></div>
+    </div>
+
+    <footer>
+      © 2025 Tanushka Kashyap | Hacked with 💚
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script>
+      const contractAddress = "0xa326ad6a1e7cc70e6a0431bc35b47fac149abdad";
+      const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "campaigns",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "target",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "deadline",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amountCollected",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "image",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_owner",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_target",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_deadline",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_image",
+				"type": "string"
+			}
+		],
+		"name": "createCampaign",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "donateToCampaign",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getCampaigns",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "title",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "target",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "deadline",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountCollected",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "image",
+						"type": "string"
+					},
+					{
+						"internalType": "address[]",
+						"name": "donators",
+						"type": "address[]"
+					},
+					{
+						"internalType": "uint256[]",
+						"name": "donations",
+						"type": "uint256[]"
+					}
+				],
+				"internalType": "struct Crowdfunding.Campaign[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "getDonators",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "numberOfCampaigns",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+      let web3;
+      let contract;
+
+      window.addEventListener("load", async () => {
+        if (window.ethereum) {
+          web3 = new Web3(window.ethereum);
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+          contract = new web3.eth.Contract(contractABI, contractAddress);
+        } else {
+          alert("MetaMask not found!");
+        }
+      });
+
+      document.getElementById("createForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const accounts = await web3.eth.getAccounts();
+
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
+        const target = web3.utils.toWei(document.getElementById("target").value.toString(), "ether");
+        const deadlineInput = document.getElementById("deadline").value;
+        const deadline = Math.floor(new Date(deadlineInput).getTime() / 1000); // Convert to UNIX timestamp
+
+        const image = document.getElementById("image").value;
+
+        const launchButton = e.target.querySelector("button");
+        launchButton.disabled = true;
+        launchButton.textContent = "🚀 Creating campaign...";
+
+        try {
+        await contract.methods
+            .createCampaign(accounts[0], title, description, target, deadline, image)
+            .send({ from: accounts[0] });
+
+        alert("✅ Campaign Created");
+        e.target.reset(); // clear form
+        } catch (error) {
+        alert("❌ Transaction failed or cancelled.");
+        console.error(error);
+        }
+
+        launchButton.disabled = false;
+        launchButton.textContent = "🚀 Launch Campaign";
+
+      });
+
+      async function loadCampaigns() {
+    const container = document.getElementById("campaignList");
+    container.innerHTML = "<p>Loading campaigns...</p>";
+
+    try {
+        const campaigns = await contract.methods.getCampaigns().call();
+        container.innerHTML = "";
+
+        campaigns.forEach((c, i) => {
+        const target = c.target ? web3.utils.fromWei(c.target.toString(), "ether") : "0";
+        const collected = c.amountCollected ? web3.utils.fromWei(c.amountCollected.toString(), "ether") : "0";
+
+        container.innerHTML += `
+            <div class="campaign">
+            <h3>${c.title}</h3>
+            <p>${c.description}</p>
+            <p><strong>Target:</strong> ${target} ETH</p>
+            <p><strong>Collected:</strong> ${collected} ETH</p>
+            <img src="${c.image}" width="100%" style="margin-top:10px; border-radius: 5px" />
+            <button onclick="donate(${i})">💸 Donate</button>
+            </div>
+        `;
+        });
+    } catch (err) {
+        container.innerHTML = "<p>Failed to load campaigns 😓</p>";
+        console.error(err);
+    }
+    }
+
+    async function donate(id) {
+    const amount = prompt("Enter amount in ETH to donate:");
+    if (!amount) return;
+
+    const accounts = await web3.eth.getAccounts();
+    await contract.methods.donateToCampaign(id).send({
+        from: accounts[0],
+        value: web3.utils.toWei(amount.toString(), "ether")
+    });
+    alert("🙏 Donation Sent");
+    loadCampaigns();
+    }
+
+    </script>
+  </body>
+</html>
