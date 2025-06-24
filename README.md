@@ -32,16 +32,18 @@ Aesthetic animations, glitchy effects, and a vibrant neon palette create a stron
 ---
 
 ## 🧪 How to Use
+Connect MetaMask
+Ensure MetaMask is installed and connected to Sepolia or your testnet of choice.
+
+## License & Copyright
+© 2025 Tanushka Kashyap
+This project is open-source under the MIT License.
+Built with 💚 and the spirit of decentralization.
 
 ### 📥 Clone the Repository
 ```bash
 git clone https://github.com/yourusername/crowdfunding-dapp.git
 cd crowdfunding-dapp
 
-Connect MetaMask
-Ensure MetaMask is installed and connected to Sepolia or your testnet of choice.
 
-License & Copyright
-© 2025 Tanushka Kashyap
-This project is open-source under the MIT License.
-Built with 💚 and the spirit of decentralization.
+
