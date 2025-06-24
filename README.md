@@ -30,6 +30,7 @@ Aesthetic animations, glitchy effects, and a vibrant neon palette create a stron
 | **Deployment** | Remix IDE (Smart Contract) + Vercel (Frontend) |
 
 ---
+## Screenshots 
 
 ## 🧪 How to Use
 Connect MetaMask
